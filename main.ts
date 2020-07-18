@@ -5,6 +5,11 @@ scene.onHitTile(SpriteKind.Player, 5, function (sprite) {
 function nextLevel () {
     scene.setTileMap(maps[currentLevel])
     scene.placeOnRandomTile(hero, 7)
+
+    for (let index = 0; index < 3; index++) {
+    
+        let enemy = sprites.create(enemyImgs[currentLevel], SpriteKind.Enemy)
+    }
     // increase the level to prepare for next time when we
     // call next level
     currentLevel = currentLevel + 1
@@ -197,7 +202,6 @@ maps = [img`
     1 1 1 1 1 1 1 1 1 1 1 e e e f e
 `]
 nextLevel()
-}
 // There are 3 levels, and we need 3 enemies
 let enemyImgs = [
     img`
