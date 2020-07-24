@@ -2,16 +2,14 @@ sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function on_on_overla
     enemy.startEffect(effects.fire, 500)
     projectile.destroy()
 
-    let enemyLife = sprites.readDataNumber(enemy, "life" )
+    let enemyLife = sprites.readDataNumber(enemy, "life" ) - 1
 
     if(enemyLife == 0){
         enemy.destroy()
     } else {
         sprites.setDataNumber(enemy, "life" , enemyLife)
+        enemy.say(enemyLife + " / " + totalEnemyLife, 200)
     }
-
-    enemyLife = 0
-    enemy.destroy()
 })
 controller.A.onEvent(ControllerButtonEvent.Pressed, function on_a_pressed() {
     sprites.createProjectileFromSprite(img`
@@ -48,6 +46,7 @@ function nextLevel() {
         enemy.setVelocity(50, 50)
         enemy.setFlag(SpriteFlag.BounceOnWall, true)
         sprites.setDataNumber(enemy, "life" , enemyLifes[currentLevel])
+        sprites.setDataNumber(enemy, "TotalLife" , enemyLifes[currentLevel])
         enemy.say(enemyLifes[currentLevel] + "")
     }
     //  increase the level to prepare for next time when we call next level
