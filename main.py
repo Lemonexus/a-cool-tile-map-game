@@ -1,20 +1,11 @@
-sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function on_on_overlap(projectile: Sprite, enemy: Sprite) {
-    enemy.startEffect(effects.fire, 500)
-    projectile.destroy()
-
-    let enemyLife = sprites.readDataNumber(enemy, "life" )
-
-    if(enemyLife == 0){
-        enemy.destroy()
-    } else {
-        sprites.setDataNumber(enemy, "life" , enemyLife)
-    }
-
-    enemyLife = 0
+def on_on_overlap(projectile, enemy):
+    enemy.start_effect(effects.fire, 500)
     enemy.destroy()
-})
-controller.A.onEvent(ControllerButtonEvent.Pressed, function on_a_pressed() {
-    sprites.createProjectileFromSprite(img`
+    projectile.destroy()
+sprites.on_overlap(SpriteKind.projectile, SpriteKind.enemy, on_on_overlap)
+
+def on_a_pressed():
+    sprites.create_projectile_from_sprite(img("""
             . . . . . . . . . . . . . . . .
                     . . . . . . . . . . . . . . . .
                     . . . . . . . . . . . 5 . . . .
@@ -31,41 +22,44 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function on_a_pressed() {
                     . 1 5 2 . . . . 2 4 1 . . . . .
                     . . . . . . . . . . 1 . . . . .
                     . . . . . . . . . . . . . . . .
-        `, hero, 50, 0)
-})
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function on_on_overlap2(player2: Sprite, enemy: Sprite) {
-    info.changeLifeBy(-1)
-    pause(1000)
-})
-//  Goes to the next level of our maps
-function nextLevel() {
-    
-    scene.setTileMap(maps[currentLevel])
-    scene.placeOnRandomTile(hero, 7)
-    for (let index = 0; index < 3; index++) {
-        enemy = sprites.create(enemyImgs[currentLevel], SpriteKind.Enemy)
-        scene.placeOnRandomTile(enemy, 1)
-        enemy.setVelocity(50, 50)
-        enemy.setFlag(SpriteFlag.BounceOnWall, true)
-        sprites.setDataNumber(enemy, "life" , enemyLifes[currentLevel])
-        enemy.say(enemyLifes[currentLevel] + "")
-    }
-    //  increase the level to prepare for next time when we call next level
-    currentLevel = currentLevel + 1
-}
+        """),
+        hero,
+        50,
+        0)
+controller.A.on_event(ControllerButtonEvent.PRESSED, on_a_pressed)
 
-scene.onHitTile(SpriteKind.Player, 5, function on_hit_tile(sprite: Sprite) {
-    game.over(true)
-})
-scene.onHitTile(SpriteKind.Player, 2, function on_hit_tile2(sprite: Sprite) {
+def on_on_overlap2(player2, enemy):
+    info.change_life_by(-1)
+    pause(1000)
+sprites.on_overlap(SpriteKind.player, SpriteKind.enemy, on_on_overlap2)
+
+# Goes to the next level of our maps
+def nextLevel():
+    global enemy, currentLevel
+    scene.set_tile_map(maps[currentLevel])
+    scene.place_on_random_tile(hero, 7)
+    for index in range(3):
+        enemy = sprites.create(enemyImgs[currentLevel], SpriteKind.enemy)
+        scene.place_on_random_tile(enemy, 1)
+        enemy.set_velocity(50, 50)
+        enemy.set_flag(SpriteFlag.BOUNCE_ON_WALL, True)
+    # increase the level to prepare for next time when we call next level
+    currentLevel = currentLevel + 1
+
+def on_hit_tile(sprite):
+    game.over(True)
+scene.on_hit_tile(SpriteKind.player, 5, on_hit_tile)
+
+def on_hit_tile2(sprite):
     nextLevel()
-})
-let enemy : Sprite = null
-let currentLevel = 0
-let enemyImgs : Image[] = []
-let maps : Image[] = []
-let hero : Sprite = null
-hero = sprites.create(img`
+scene.on_hit_tile(SpriteKind.player, 2, on_hit_tile2)
+
+enemy: Sprite = None
+currentLevel = 0
+enemyImgs: List[Image] = []
+maps: List[Image] = []
+hero: Sprite = None
+hero = sprites.create(img("""
         . . . . f f f f . . . . 
             . . f f e e e e f f . . 
             . f f e e e e e e f f . 
@@ -82,10 +76,12 @@ hero = sprites.create(img`
             4 4 f 6 6 6 6 6 6 f 4 4 
             . . . f f f f f f . . . 
             . . . f f . . f f . . .
-    `, SpriteKind.Player)
-controller.moveSprite(hero)
-scene.cameraFollowSprite(hero)
-scene.setTile(15, img`
+    """),
+    SpriteKind.player)
+controller.move_sprite(hero)
+scene.camera_follow_sprite(hero)
+scene.set_tile(15,
+    img("""
         . . . . . c c b b b . . . . . . 
             . . . . c b d d d d b . . . . . 
             . . . . c d d d d d d b b . . . 
@@ -102,8 +98,10 @@ scene.setTile(15, img`
             . . c c c c c b b b b b b b c . 
             . . . . . . c c b b b b c c . . 
             . . . . . . . . c c c c . . . .
-    `, true)
-scene.setTile(14, img`
+    """),
+    True)
+scene.set_tile(14,
+    img("""
         . . b d b . . . . . b b b b . . 
             . c b d d b . . . b b d d d b . 
             . b c c b . . . b c d d d d b . 
@@ -120,8 +118,10 @@ scene.setTile(14, img`
             . b c c c b . b d d d b b c b . 
             . . . . . . b d d d b c c b . . 
             . . . . . . b b b c c c b . . .
-    `, true)
-scene.setTile(1, img`
+    """),
+    True)
+scene.set_tile(1,
+    img("""
         7 7 7 7 5 7 7 7 7 7 7 7 7 7 7 7 
             7 7 5 7 5 5 7 7 7 7 7 7 7 7 7 7 
             7 6 5 5 7 5 7 5 5 7 7 7 7 7 7 7 
@@ -138,8 +138,10 @@ scene.setTile(1, img`
             7 7 7 7 7 7 7 7 7 7 7 7 7 5 7 7 
             7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 
             7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7
-    `, false)
-scene.setTile(2, img`
+    """),
+    False)
+scene.set_tile(2,
+    img("""
         c c c c c c c c c c c c c c c c 
             c c c c c c c c c c c b b b b c 
             c c c c c c c c c c c b b b b c 
@@ -156,8 +158,10 @@ scene.setTile(2, img`
             c b b b b b b b b b b b b b b c 
             c d d d d b b b b b b b b b b c 
             c b b b b b b b b b b b b b b c
-    `, true)
-scene.setTile(7, img`
+    """),
+    True)
+scene.set_tile(7,
+    img("""
         7 6 7 6 6 6 6 6 6 6 6 6 6 6 6 6 
             6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 
             6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 
@@ -174,8 +178,10 @@ scene.setTile(7, img`
             6 6 6 6 6 6 6 6 6 7 7 6 6 6 6 6 
             6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 7 
             6 6 7 6 6 6 6 6 6 6 6 6 6 6 6 7
-    `, false)
-scene.setTile(5, img`
+    """),
+    False)
+scene.set_tile(5,
+    img("""
         . . b b b b b b b b b b b b . . 
             . b e 4 4 4 4 4 4 4 4 4 4 e b . 
             b e 4 4 4 4 4 4 4 4 4 4 4 4 e b 
@@ -192,9 +198,10 @@ scene.setTile(5, img`
             b c e e e e e e e e e e e e c b 
             b b b b b b b b b b b b b b b b 
             . b b . . . . . . . . . . b b .
-    `, true)
-//  Define all my maps
-maps = [img`
+    """),
+    True)
+# Define all my maps
+maps = [img("""
         7 f f f f f f 1 1 1 1 e 1 1 1 1 
             1 1 1 1 1 1 1 f f f f e f 1 1 1 
             1 1 1 1 1 1 1 1 1 1 1 e 1 1 1 1 
@@ -211,7 +218,8 @@ maps = [img`
             1 e f 1 1 1 1 e e e 1 e 1 f 1 1 
             1 1 f f f 1 1 1 1 1 e e e 1 f 1 
             1 1 1 1 1 f f 1 1 1 1 1 1 1 1 2
-    `, img`
+    """),
+    img("""
         7 1 1 f 1 1 1 1 1 1 1 1 f 1 1 1 
             1 1 1 f 1 1 1 1 1 1 1 1 f 1 1 1 
             1 1 1 f 1 1 1 1 1 e e e f 1 1 1 
@@ -228,7 +236,8 @@ maps = [img`
             1 1 1 1 1 1 1 1 1 1 1 1 1 1 f 1 
             1 1 1 1 1 1 1 1 1 e 1 1 1 1 f 1 
             1 1 1 e e e 1 1 1 1 1 1 1 1 f 2
-    `, img`
+    """),
+    img("""
         7 1 1 1 1 1 1 1 1 1 1 1 1 f f f 
             1 1 1 1 1 1 1 1 1 1 1 1 1 f 1 f 
             1 1 1 1 1 1 1 1 1 1 1 1 1 e 1 f 
@@ -245,9 +254,9 @@ maps = [img`
             1 1 1 1 1 1 1 1 1 1 1 e 1 1 1 e 
             1 1 1 1 1 1 1 1 1 1 1 f 1 1 1 e 
             1 1 1 1 1 1 1 1 1 1 1 e e e f e
-    `]
-//  There are 3 levels, and we need 3 enemies
-enemyImgs = [img`
+    """)]
+# There are 3 levels, and we need 3 enemies
+enemyImgs = [img("""
         . . . . . f f f f f . . . . . . 
             . . . . f e e e e e f . . . . . 
             . . . f d d d d d d e f . . . . 
@@ -264,7 +273,8 @@ enemyImgs = [img`
             . f b d f e e f b b f f f e f . 
             . f d d f f f f d d b f f f f . 
             . f f f f f f f f f f f f f . .
-    `, img`
+    """),
+    img("""
         . . . . . c c c c c c c . . . . 
             . . . . c 6 7 7 7 7 7 6 c . . . 
             . . . c 7 c 6 6 6 6 c 7 6 c . . 
@@ -281,7 +291,8 @@ enemyImgs = [img`
             f 6 1 1 1 1 1 6 6 6 6 6 6 c . . 
             . f 6 1 1 1 1 1 6 6 6 6 c . . . 
             . . f f c c c c c c c c . . . .
-    `, img`
+    """),
+    img("""
         . . . . . . . . . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . . . . . . . . . 
@@ -306,8 +317,6 @@ enemyImgs = [img`
             . . . . . . . . . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . . . . . . . . .
-    `]
-    // Set enemy lifes
-    let enemyLifes = [3,5,7]
-info.setLife(3)
+    """)]
+info.set_life(3)
 nextLevel()
