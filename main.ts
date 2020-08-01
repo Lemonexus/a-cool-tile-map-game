@@ -3,7 +3,7 @@ sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function on_on_overla
     projectile.destroy()
 
     let enemyLife = sprites.readDataNumber(enemy, "life" ) - 1
-
+    let totalEnemyLife = sprites.readDataNumber(enemy, "TotalLife")
     if(enemyLife == 0){
         enemy.destroy()
     } else {
@@ -308,5 +308,7 @@ enemyImgs = [img`
     `]
     // Set enemy lifes
     let enemyLifes = [3,5,7]
+
+    let addedEnemies: Sprite [] = []
 info.setLife(3)
 nextLevel()
